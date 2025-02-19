@@ -1,0 +1,50 @@
+.sales-table {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-top: 2rem;
+}
+
+.sales-table table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.sales-table th {
+    background: var(--gray-50);
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    text-align: left;
+    color: var(--gray-700);
+}
+
+.sales-table td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.sale-product {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.product-name {
+    font-weight: 500;
+    color: var(--gray-800);
+}
+
+.action-btn {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.delete-btn {
+    background: #FEE2E2;
+    color: var(--danger);
+}

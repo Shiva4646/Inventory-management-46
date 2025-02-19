@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - StockManager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0F766E;
+            --primary-light: rgba(15, 118, 110, 0.1);
+            --success: #059669;
+            --warning: #F59E0B;
+            --danger: #DC2626;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F9FAFB;
+        }
+
+        .dashboard-card {
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .stat-trend-up {
+            color: var(--success);
+        }
+
+        .stat-trend-down {
+            color: var(--danger);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .quick-action-btn {
+            transition: all 0.3s ease;
+        }
+
+        .quick-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .quick-action-btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 640px) {
+            .quick-action-btn i {
+                font-size: 1.25rem;
+            }
+        }
+
+        .text-success { color: var(--success); }
+        .text-warning { color: var(--warning); }
+        .text-danger { color: var(--danger); }
+
+        .max-h-20 {
+            max-height: 5rem;
+        }
+
+        .overflow-y-auto {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 2px;
+        }
+
+        .max-h-32 {
+            max-height: 8rem;
+        }
+
+        /* Stock list item hover effect */
+        #healthyStockList > div:hover,
+        #lowStockList > div:hover,
+        #criticalStockList > div:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            border-radius: 0.25rem;
+        }
+
+        /* Custom scrollbar for stock lists */
+        .overflow-y-auto::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 2px;
+        }
+
+        .overflow-y-auto {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="flex h-screen overflow-hidden">
+        <div class="hidden md:flex md:flex-shrink-0">
+            <div class="flex flex-col w-64 bg-gray-800">
+                <div class="flex items-center h-16 px-4">
+                    <span class="text-2xl font-semibold text-white">StockManager</span>
+                </div>
+                <div class="flex flex-col flex-1 overflow-y-auto">
+                    <nav class="flex-1 px-2 py-4 space-y-2">
+                        <a href="#" class="flex items-center px-4 py-3 text-white bg-gray-700 rounded-lg">
+                            <i class="fas fa-home mr-3"></i>
+                            Dashboard
+                        </a>
+                        <a href="products.html" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg">
+                            <i class="fas fa-box mr-3"></i>
+                            Products
+                        </a>
+                        <a href="sales.html" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg">
+                            <i class="fas fa-chart-line mr-3"></i>
+                            Sales
+                        </a>
+                        <a href="reports.html" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg">
+                            <i class="fas fa-file-alt mr-3"></i>
+                            Reports
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex flex-col flex-1 overflow-y-auto">
+            <!-- Header -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <!-- Left Side -->
+                    <div class="flex items-center space-x-4">
+                        <button class="md:hidden text-gray-500 hover:text-gray-600">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <div class="flex items-center">
+                            <i class="fas fa-box-open text-teal-600 text-2xl mr-2"></i>
+                            <span class="text-xl font-semibold text-gray-800">Stock Manager</span>
+                        </div>
+                    </div>
+
+                    <!-- Right Side -->
+                    <div class="flex items-center space-x-4">
+                        <button id="newSaleBtn" class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition duration-150 flex items-center">
+                            <i class="fas fa-plus mr-2"></i>
+                            <span>New Sale</span>
+                        </button>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-600">Welcome, Admin</span>
+                            <img src="https://ui-avatars.com/api/?name=Admin&background=0F766E&color=fff" 
+                                 alt="Admin" 
+                                 class="w-8 h-8 rounded-full border-2 border-teal-600">
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="flex-1 px-6 py-8">
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Revenue Card -->
+                    <div id="revenue-card" class="bg-white rounded-xl shadow-md p-6 dashboard-card">
+                        <!-- Content will be dynamically inserted -->
+                    </div>
+
+                    <!-- Products Card -->
+                    <div id="products-card" class="bg-white rounded-xl shadow-md p-6 dashboard-card">
+                        <!-- Content will be dynamically inserted -->
+                    </div>
+
+                    <!-- Sales Card -->
+                    <div id="sales-card" class="bg-white rounded-xl shadow-md p-6 dashboard-card">
+                        <!-- Content will be dynamically inserted -->
+                    </div>
+
+                    <!-- Stock Card -->
+                    <div id="stock-card" class="bg-white rounded-xl shadow-md p-6 dashboard-card">
+                        <!-- Content will be dynamically inserted -->
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <!-- Sales Trend -->
+                    <div class="bg-white rounded-xl shadow-md p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">Sales Trend</h3>
+                            <select id="salesTrendRange" class="text-sm border rounded-lg px-2 py-1">
+                                <option value="7">Last 7 Days</option>
+                                <option value="30">Last 30 Days</option>
+                                <option value="90">Last 90 Days</option>
+                            </select>
+                        </div>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="salesTrendChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Stock Overview -->
+                    <div class="bg-white rounded-xl shadow-md p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">Stock Overview</h3>
+                            <div class="flex items-center space-x-2">
+                                <button id="refreshStockChart" class="text-sm text-teal-600 hover:text-teal-700">
+                                    <i class="fas fa-sync-alt mr-1"></i>Refresh
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-container relative h-64">
+                            <canvas id="stockOverviewChart"></canvas>
+                        </div>
+                        <!-- Add this stock summary section -->
+                        <div class="grid grid-cols-3 gap-4 mt-6">
+                            <div class="text-center">
+                                <p class="text-sm text-gray-500">Healthy Stock</p>
+                                <p id="healthyStockCount" class="text-xl font-semibold text-green-600">0</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm text-gray-500">Low Stock</p>
+                                <p id="lowStockCount" class="text-xl font-semibold text-yellow-600">0</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm text-gray-500">Critical Stock</p>
+                                <p id="criticalStockCount" class="text-xl font-semibold text-red-600">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity & Quick Actions -->
+                <!-- Replace the Recent Activity & Quick Actions section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Recent Activity -->
+                    <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Recent Activity</h3>
+                        <div class="space-y-3">
+                            <!-- Activities will be dynamically inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="bg-white rounded-xl shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
+                        <!-- Update the Quick Actions buttons in dashboard.html -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <button class="quick-action-btn p-4 bg-teal-50 rounded-lg text-center hover:bg-teal-100" data-action="addProduct">
+                                <i class="fas fa-plus-circle text-teal-600 text-2xl mb-2"></i>
+                                <span class="block text-sm font-medium text-gray-700">Add Product</span>
+                            </button>
+                            <button class="quick-action-btn p-4 bg-blue-50 rounded-lg text-center hover:bg-blue-100" data-action="newSale">
+                                <i class="fas fa-shopping-cart text-blue-600 text-2xl mb-2"></i>
+                                <span class="block text-sm font-medium text-gray-700">New Sale</span>
+                            </button>
+                            <button class="quick-action-btn p-4 bg-indigo-50 rounded-lg text-center hover:bg-indigo-100" data-action="viewReports">
+                                <i class="fas fa-chart-line text-indigo-600 text-2xl mb-2"></i>
+                                <span class="block text-sm font-medium text-gray-700">Reports</span>
+                            </button>
+                            <button class="quick-action-btn p-4 bg-orange-50 rounded-lg text-center hover:bg-orange-100" data-action="manageInventory">
+                                <i class="fas fa-boxes text-orange-600 text-2xl mb-2"></i>
+                                <span class="block text-sm font-medium text-gray-700">Inventory</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Remove or comment out this section -->
+    <!--
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sales Trend Chart initialization...
+            // Stock Overview Chart initialization...
+        });
+    </script>
+    -->
+    <script src="js/dashboard.js"></script>
+    <script>
+        let dashboardManager;
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                console.log('Initializing dashboard...');
+                dashboardManager = new DashboardManager();
+                window.dashboardManager = dashboardManager;
+                console.log('Dashboard initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize dashboard:', error);
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'p-4 m-4 bg-red-100 border border-red-400 text-red-700 rounded';
+                errorMessage.textContent = 'Failed to load dashboard. Please refresh the page.';
+                document.body.prepend(errorMessage);
+            }
+        });
+    </script>
+</body>
+</html>

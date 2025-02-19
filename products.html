@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management - StockManager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0F766E;
+            --primary-hover: #115e59;
+            --primary-light: rgba(15, 118, 110, 0.1);
+            --danger: #DC2626;
+            --warning: #F59E0B;
+            --success: #059669;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F9FAFB;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            height: 64px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+        }
+
+        .header .container {
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .logo {
+            color: var(--primary);
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            text-decoration: none;
+            padding: 0.5rem 0;
+            transition: color 0.2s ease;
+        }
+
+        .logo:hover {
+            color: var(--primary-hover);
+        }
+
+        @media (max-width: 768px) {
+            .header .container {
+                padding: 0 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--gray-700);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .stat-card:nth-child(1) .stat-icon {
+            background: linear-gradient(135deg, var(--primary-light) 0%, rgba(14, 165, 233, 0.1) 100%);
+            color: var(--primary);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 146, 60, 0.1) 100%);
+            color: var(--warning);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background: linear-gradient(135deg, rgba(5, 150, 105, 0.1) 0%, rgba(52, 211, 153, 0.1) 100%);
+            color: var(--success);
+            font-size: 1.75rem; /* Adjust size for rupee symbol */
+        }
+
+        .stat-card:nth-child(3) .stat-icon i {
+            transform: translateY(-1px); /* Fine-tune vertical alignment */
+        }
+
+        .stat-card:nth-child(1) .stat-value {
+            background: linear-gradient(135deg, var(--primary) 0%, #0EA5E9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-card:nth-child(2) .stat-value {
+            background: linear-gradient(45deg, var(--warning), #FB923C);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-card:nth-child(3) .stat-value {
+            background: linear-gradient(45deg, var(--success), #34D399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-value {
+            font-size: 1.875rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin: 0 0 0.5rem 0;
+            background: linear-gradient(135deg, var(--primary) 0%, #0EA5E9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-card:hover .stat-value {
+            transform: scale(1.05);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: color 0.3s ease;
+        }
+
+        .stat-change[data-trend="up"] {
+            color: var(--success);
+        }
+
+        .stat-change[data-trend="down"] {
+            color: var(--danger);
+        }
+
+        .stat-change i {
+            margin-right: 0.25rem;
+        }
+
+        .search-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2.5rem;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 480px;
+            padding: 1rem 1.25rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .search-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .search-results tr {
+            background: var(--primary-light);
+            transition: background-color 0.3s ease;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-700);
+            background: white;
+            border-radius: 0.75rem;
+            margin: 1rem 0;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .product-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #E5E7EB;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .table-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        th, td {
+            padding: 1.25rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        th {
+            background: #F9FAFB;
+            font-weight: 600;
+            color: #374151;
+            text-align: left;
+            border-bottom: 2px solid #E5E7EB;
+        }
+
+        .action-btn {
+            padding: 0.625rem;
+            border-radius: 0.75rem;
+            border: none;
+            cursor: pointer;
+            margin: 0 0.25rem;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .edit-btn {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .delete-btn {
+            background: #FEE2E2;
+            color: var(--danger);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-in-stock {
+            background: #DEF7EC;
+            color: var (--success);
+        }
+
+        .status-low {
+            background: #FEF3C7;
+            color: var(--warning);
+        }
+
+        .status-out {
+            background: #FEE2E2;
+            color: var(--danger);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            .search-section {
+                flex-direction: column;
+            }
+            .search-input {
+                max-width: 100%;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .table-container {
+                overflow-x: auto;
+            }
+        }
+
+        .search-highlight {
+            background-color: var(--primary-light) !important;
+            transition: background-color 0.3s ease;
+        }
+
+        .image-upload {
+            border: 2px dashed var(--primary-light);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #F9FAFB;
+        }
+
+        .image-upload:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .image-upload input[type="file"] {
+            display: none;
+        }
+
+        .image-upload i {
+            color: var(--primary);
+            font-size: 1.25rem;
+        }
+
+        .product-image-cell {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .product-image-container {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.375rem;
+            overflow: hidden;
+            border: 1px solid #E5E7EB;
+            flex-shrink: 0;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-name {
+            font-weight: 500;
+            color: #111827;
+        }
+
+        .image-upload-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-light);
+        }
+
+        .selected-file-name {
+            color: #6B7280;
+            font-size: 0.875rem;
+        }
+
+        .mr-1 {
+            margin-right: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+    <div class="container">
+        <a href="index.html" class="logo">StockManager</a>
+    </div>
+</header>
+
+    <main class="container">
+        <div class="dashboard">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-box"></i>
+        </div>
+        <h3 class="stat-label">Total Products</h3>
+        <p class="stat-value" data-stat="total-products">0</p>
+        <span class="stat-change" data-stat="monthly-change">0% from yesterday</span>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3 class="stat-label">Low Stock Items</h3>
+        <p class="stat-value" data-stat="low-stock">0</p>
+        <span class="stat-change">0% from yesterday</span>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-rupee-sign"></i>
+        </div>
+        <h3 class="stat-label">Total Value</h3>
+        <p class="stat-value" data-stat="total-value">₹0.00</p>
+        <span class="stat-change">0% from yesterday</span>
+    </div>
+</div>
+
+        <div class="search-section">
+    <div class="search-container">
+        <input type="text" class="search-input" placeholder="Search products...">
+    </div>
+</div>
+
+        <form id="productForm" class="product-form">
+            <h2 style="margin: 0 0 1.5rem 0; color: #1F2937;">Add New Product</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Product Name</label>
+                    <input type="text" name="name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select name="category" class="form-input" required>
+                        <option value="">Select Category</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="clothing">Clothing</option>
+                        <option value="food">Food</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Price</label>
+                    <input type="number" name="price" step="0.01" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Stock</label>
+                    <input type="number" name="stock" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Product Image</label>
+                    <div class="image-upload-container">
+                        <input type="file" 
+                               id="imageInput" 
+                               accept="image/*"
+                               style="display: none;">
+                        <input type="hidden" name="image">
+                        <button type="button" 
+                                class="btn btn-outline" 
+                                onclick="document.getElementById('imageInput').click()">
+                            <i class="fas fa-upload"></i>
+                            Choose Image
+                        </button>
+                        <span class="selected-file-name"></span>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                Add Product
+            </button>
+        </form>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                    <tr>
+                        <td>iPhone 13 Pro</td>
+                        <td>Electronics</td>
+                        <td>$999.00</td>
+                        <td>45</td>
+                        <td><span class="status-badge status-in-stock">In Stock</span></td>
+                        <td>
+                            <button class="action-btn edit-btn"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete-btn"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="js/products.js"></script>
+</body>
+</html>

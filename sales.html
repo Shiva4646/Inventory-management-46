@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Management - StockManager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0F766E;
+            --primary-dark: #115e59;
+            --primary-light: rgba(15, 118, 110, 0.1);
+            --success: #059669;
+            --warning: #F59E0B;
+            --danger: #DC2626;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--gray-50);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main Layout */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Dashboard Cards */
+        .sales-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .stat-card:nth-child(1) .stat-icon {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background: rgba(5, 150, 105, 0.1);
+            color: var(--success);
+        }
+
+        .stat-value {
+            font-size: 2.75rem;
+            font-weight: 800;
+            margin: 0.75rem 0;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            transition: all 0.3s ease;
+        }
+
+        /* Total Sales Value */
+        .stat-card:nth-child(1) .stat-value {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--primary); /* Fallback */
+        }
+
+        /* Items Sold Value */
+        .stat-card:nth-child(2) .stat-value {
+            background: linear-gradient(135deg, var(--warning) 0%, #EA580C 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--warning); /* Fallback */
+        }
+
+        /* Top Product Value */
+        .stat-card:nth-child(3) .stat-value {
+            background: linear-gradient(135deg, var(--success) 0%, #047857 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--success); /* Fallback */
+        }
+
+        .stat-label {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        /* Form Section */
+        .sales-form {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 3rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            position: relative;
+            margin: 0;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.625rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-input {
+            width: 100%;
+            min-width: 100px;
+            max-width: 150px;
+        }
+
+        .form-select {
+            width: 100%;
+            min-width: 300px;
+        }
+
+        /* Table Section */
+        .sales-table {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        th {
+            background: var(--gray-50);
+            padding: 0.875rem 1rem;
+            font-weight: 500;
+            text-align: left;
+            color: var(--gray-700);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            transition: background-color 0.2s ease;
+        }
+
+        tr:hover td {
+            background-color: var(--gray-50);
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+
+        .stat-label {
+            color: var(--gray-700);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-primary {
+            height: 45px;
+            padding: 0.625rem 1.25rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+            white-space: nowrap;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        }
+
+        .btn-primary i {
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-primary:hover i {
+            transform: translateX(2px);
+        }
+
+        .date-time {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .date {
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+
+        .time {
+            font-size: 0.75rem;
+            color: var(--gray-700);
+        }
+
+        .action-btn {
+            padding: 0.625rem;
+            border-radius: 0.75rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            font-size: 1rem;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .edit-btn {
+            background: var(--primary-light);
+            color: var(--primary);
+            margin-right: 0.5rem;
+        }
+
+        .edit-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .delete-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .delete-btn:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .sales-table {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+            overflow: hidden;
+        }
+
+        .sales-table table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .sales-table th {
+            background: var(--gray-50);
+            padding: 0.875rem 1rem;
+            font-weight: 500;
+            text-align: left;
+            color: var(--gray-700);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .sales-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .sales-table tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .sales-table tr:hover {
+            background-color: var(--gray-50);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-cell {
+            width: 100px;
+            text-align: right;
+        }
+
+        @media (max-width: 1024px) {
+            .sales-dashboard {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+            
+            .action-btn {
+                width: 2.25rem;
+                height: 2.25rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sales-dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            td, th {
+                padding: 1rem;
+            }
+            
+            .action-btn {
+                width: 2rem;
+                height: 2rem;
+                font-size: 0.875rem;
+            }
+        }
+
+        .new-sale-section {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            margin-top: 0;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .stats-section {
+            margin-bottom: 2rem;
+        }
+
+        .sales-list-section {
+            background: white;
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(to right, var(--primary-light), rgba(15, 118, 110, 0.05));
+            padding: 2rem;
+            border-radius: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        .dashboard-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .dashboard-title i {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        /* Header and Card Styles */
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 1rem 0;
+            height: 64px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header .container {
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .logo {
+            color: var(--primary);
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .trend-up {
+            color: var(--success);
+        }
+
+        .trend-down {
+            color: var(--danger);
+        }
+
+        .trend-neutral {
+            color: var(--gray-700);
+        }
+
+        .stat-change i {
+            font-size: 0.75rem;
+        }
+
+        .trend-up, .trend-down, .trend-neutral {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+        }
+
+        .nav-link {
+            color: var(--gray-600);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="flex items-center justify-between w-full">
+                <div class="flex items-center gap-4">
+                    
+                    <h1 class="logo">Sales Dashboard</h1>
+                </div>
+                
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Stats Dashboard with improved layout -->
+        <div class="sales-dashboard">
+            <!-- Total Sales Card -->
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="stat-label">Total Sales</h3>
+                <p class="stat-value" data-stat="total-sales">₹0</p>
+                <span class="stat-change trend-neutral">
+                    <i class="fas fa-minus"></i>0% from yesterday
+                </span>
+            </div>
+
+            <!-- Total Items Sold Card -->
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-box"></i>
+                </div>
+                <h3 class="stat-label">Items Sold</h3>
+                <p class="stat-value" data-stat="items-sold">0</p>
+                <span class="stat-change trend-neutral">
+                    <i class="fas fa-minus"></i>0% from yesterday
+                </span>
+            </div>
+
+            <!-- Top Product Card -->
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <h3 class="stat-label">Top Product</h3>
+                <p class="stat-value" data-stat="top-product-sales">₹0</p>
+                <span class="product-name" data-stat="top-product-name">No sales yet</span>
+            </div>
+        </div>
+
+        <!-- New Sale Form Section -->
+        <div class="new-sale-section">
+            <h2 class="section-title">
+                <i class="fas fa-plus-circle"></i>
+                Record New Sale
+            </h2>
+            <form id="salesForm" class="sales-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Select Product</label>
+                        <select class="form-select product-select" name="product" required>
+                            <option value="">Choose Product</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" name="quantity" class="form-input" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn-primary">Record Sale</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sales List Section -->
+        <div class="sales-list-section">
+            <h2 class="section-title">
+                <i class="fas fa-list"></i>
+                Sales History
+            </h2>
+            <div class="sales-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/sales.js"></script>
+    <script>
+        // Ensure salesManager is accessible
+        let salesManager;
+        document.addEventListener('DOMContentLoaded', () => {
+            salesManager = window.salesManager;
+        });
+    </script>
+</body>
+</html>
